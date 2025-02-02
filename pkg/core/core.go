@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/ThisaraWeerakoon/Intial_Synapse_Go/pkg/models"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
 )
 
 type fileInboundAdapterInterface interface {
