@@ -5,5 +5,8 @@ import (
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	fmt.Println("Starting the core....")
+	
+
 }
+
