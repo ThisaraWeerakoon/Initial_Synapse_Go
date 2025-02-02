@@ -8,6 +8,10 @@ type FileInboundAdapter struct{
 
 }
 
+func NewFileInboundAdapter() *FileInboundAdapter {
+	return &FileInboundAdapter{}
+}
+
 func (f  *FileInboundAdapter) StartPolling() {
 	//start polling
 }
