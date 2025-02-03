@@ -17,7 +17,7 @@ func MoveFile(source, destination string) error {
 }
 
 // PollFolder continuously reads files at a given interval
-func PollFolder(inDir string, outDir string, failedDir string, interval int) {
+func PollFolder(inDir string, outDir string, failedDir string, interval int, pattern string) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second) // Ensures precise polling
 	defer ticker.Stop()
 
@@ -29,7 +29,7 @@ func PollFolder(inDir string, outDir string, failedDir string, interval int) {
 		processFailedFiles(inDir, failedDir)
 
 		// Get the list of files at the start of this polling event
-		files, err := scanDirectory(inDir)
+		files, err := scanDirectoryWithPattern(inDir, pattern)
 		if err != nil {
 			log.Printf("Error scanning directory %s: %v", inDir, err)
 			continue
@@ -56,7 +56,7 @@ func ProcessFile(file string) {
 		log.Printf("Error reading file %s: %v", file, err)
 		return
 	}
-	fmt.Printf("Processed: %s\nMetadata: %+v\nContent:\n%s\n", file, metadata, metadata.Context)
+	
 
 }
 
@@ -139,23 +139,7 @@ func processFailedFiles(inDir, failedDir string) {
 	}
 }
 
-// Scan a directory and return the list of files present at the start of polling
-func scanDirectory(folderPath string) ([]string, error) {
-	var files []string
 
-	entries, err := os.ReadDir(folderPath)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, entry := range entries {
-		if !entry.IsDir() { // Ignore directories
-			files = append(files, filepath.Join(folderPath, entry.Name()))
-		}
-	}
-
-	return files, nil
-}
 
 // Scan a directory and return the list of files matching the given pattern
 func scanDirectoryWithPattern(folderPath, pattern string) ([]string, error) {
@@ -189,12 +173,14 @@ type CoreInterface interface {
 
 type FileInboundAdapter struct{
 	models.Configurations
+	core *CoreInterface
 
 }
 
-func NewFileInboundAdapter(config models.Configurations) *FileInboundAdapter {
+func NewFileInboundAdapter(config models.Configurations, core *CoreInterface) *FileInboundAdapter {
 	return &FileInboundAdapter{
 		Configurations: config,
+		core: core,
 	}
 }
 
