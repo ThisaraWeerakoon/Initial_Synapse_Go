@@ -20,6 +20,9 @@ func NewCore() *Core {
 	return &Core{}
 }
 
+func (c *Core) ReceiveRequests() {
+	//receive requests
+}
 
 
 func (c *Core) Run() {

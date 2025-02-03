@@ -17,8 +17,8 @@ func MoveFile(source, destination string) error {
 }
 
 // PollFolder continuously reads files at a given interval
-func PollFolder(folderPath string, interval time.Duration) {
-	ticker := time.NewTicker(interval) // Ensures precise polling
+func PollFolder(inDir string, outDir string, failedDir string, interval int) {
+	ticker := time.NewTicker(time.Duration(interval) * time.Second) // Ensures precise polling
 	defer ticker.Stop()
 
 	for range ticker.C {
@@ -26,48 +26,48 @@ func PollFolder(folderPath string, interval time.Duration) {
 		fmt.Println("\n--- New Polling Event ---")
 
 		// Process failed_files.txt if available
-		processFailedFiles(folderPath)
+		processFailedFiles(inDir, failedDir)
 
 		// Get the list of files at the start of this polling event
-		files, err := scanDirectory(folderPath)
+		files, err := scanDirectory(inDir)
 		if err != nil {
-			log.Printf("Error scanning directory %s: %v", folderPath, err)
+			log.Printf("Error scanning directory %s: %v", inDir, err)
 			continue
 		}
 
 		// Process each file
 		for _, file := range files {
-			metadata, content, err := ReadFile(file)
-			if err != nil {
-				log.Printf("Error reading file %s: %v", file, err)
-				continue
-			}
-			fmt.Printf("Processed: %s\nMetadata: %+v\nContent:\n%s\n", file, metadata, content)
+			//have to test is it safe to make go routines for each file arbitrarily
+			// A solution may be put a threshold (eg:- 100 files) and then make go routines for each file.If the number of files is greater than the threshold make only upper limit (threshold) of go routines
+			go ProcessFile(file)
 		}
 
 		// Ensure accurate polling interval
 		elapsed := time.Since(startTime)
-		if elapsed < interval {
-			time.Sleep(interval - elapsed)
+		if elapsed < time.Duration(interval)*time.Second {
+			time.Sleep(time.Duration(interval)*time.Second - elapsed)
 		}
 	}
 }
 
+func ProcessFile(file string) {
+	metadata, err := ReadFile(file)
+	if err != nil {
+		log.Printf("Error reading file %s: %v", file, err)
+		return
+	}
+	fmt.Printf("Processed: %s\nMetadata: %+v\nContent:\n%s\n", file, metadata, metadata.Context)
 
-// FileMetadata stores metadata of the file
-type FileMetadata struct {
-	Name     string // File name
-	Size     int64  // File size in bytes
-	FileType string // File extension
 }
 
+
 // ReadFile reads a file and returns metadata & content
-func ReadFile(filePath string) (*FileMetadata, string, error) {
+func ReadFile(filePath string) (*models.ExtractedFileData, error) {
 	// Open the file
 	file, err := os.Open(filePath)
 	if err != nil {
 		log.Printf("Error opening file %s: %v", filePath, err)
-		return nil, "", err
+		return nil, err
 	}
 	defer file.Close()
 
@@ -75,10 +75,10 @@ func ReadFile(filePath string) (*FileMetadata, string, error) {
 	info, err := file.Stat()
 	if err != nil {
 		log.Printf("Error getting file info for %s: %v", filePath, err)
-		return nil, "", err
+		return nil, err
 	}
 
-	metadata := &FileMetadata{
+	metadata := &models.FileMetadata{
 		Name:     info.Name(),
 		Size:     info.Size(),
 		FileType: filepath.Ext(filePath), // Get file extension
@@ -88,17 +88,17 @@ func ReadFile(filePath string) (*FileMetadata, string, error) {
 	content, err := io.ReadAll(file)
 	if err != nil {
 		log.Printf("Error reading file %s: %v", filePath, err)
-		return metadata, "", err
+		//return metadata, "", err
+		return &models.ExtractedFileData{FileMetadata: *metadata, Context: ""}, err
 	}
 
-	return metadata, string(content), nil
+	return &models.ExtractedFileData{FileMetadata: *metadata, Context: string(content)}, nil
 }
 
-// Moves failed files from `test/in/` to `test/failed/`
-func processFailedFiles(failedFilePath string) {
-	baseDir := "test" // Root directory for test folders
-	inDir := filepath.Join(baseDir, "in")
-	failedDir := filepath.Join(baseDir, "failed")
+// Moves failed files from `test/in/` to `test/failed/`. test/failed/failed_files.txt contains the list of failed files.
+func processFailedFiles(inDir, failedDir string) {
+	// Path to failed_files.txt
+	failedFilePath := filepath.Join(failedDir, "failed_files.txt")
 
 	// Open failed_files.txt if it exists
 	file, err := os.Open(failedFilePath)
@@ -149,7 +149,7 @@ func scanDirectory(folderPath string) ([]string, error) {
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() && entry.Name() != "failed_files.txt" { // Ignore directories and failed_files.txt
+		if !entry.IsDir() { // Ignore directories
 			files = append(files, filepath.Join(folderPath, entry.Name()))
 		}
 	}
@@ -157,9 +157,34 @@ func scanDirectory(folderPath string) ([]string, error) {
 	return files, nil
 }
 
+// Scan a directory and return the list of files matching the given pattern
+func scanDirectoryWithPattern(folderPath, pattern string) ([]string, error) {
+	var files []string
+
+	entries, err := os.ReadDir(folderPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			matched, err := filepath.Match(pattern, entry.Name()) // Match file pattern
+			if err != nil {
+				log.Printf("Error matching pattern %s: %v", pattern, err)
+				continue
+			}
+			if matched {
+				files = append(files, filepath.Join(folderPath, entry.Name()))
+			}
+		}
+			files = append(files, filepath.Join(folderPath, entry.Name()))
+	}
+	return files, nil
+}
 
 type CoreInterface interface {
 	//ReceiveRequests
+	ReceiveRequests()
 }
 
 type FileInboundAdapter struct{
@@ -175,7 +200,7 @@ func NewFileInboundAdapter(config models.Configurations) *FileInboundAdapter {
 
 func (f  *FileInboundAdapter) StartPolling() {
 	//start polling
-	PollFolder(f.FileURI, time.Duration(f.Interval)*time.Second)
+	PollFolder(f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval)
 
 }
 
@@ -184,8 +209,8 @@ func (f  *FileInboundAdapter) ReceiveResults() {
 }
 
 func (f  *FileInboundAdapter) Start() {
-	//start process
-	PollFolder(f.FileURI, time.Duration(f.Interval)*time.Second)
+	//start polling
+	go f.StartPolling() //used go routine since there may be another functionalities in fileinbound in furture improvements
 
 }
 
