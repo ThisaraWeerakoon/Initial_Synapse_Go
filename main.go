@@ -1,11 +1,17 @@
 package main
 
 import (
-	"fmt"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/core"
+
 )
 
-func main() {
-	fmt.Println("Starting the core....")
+
+
+func main () {
+	core := core.NewCore()
+	core.Run()
+
+
 	
 
 }
