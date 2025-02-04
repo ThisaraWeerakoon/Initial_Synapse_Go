@@ -17,7 +17,7 @@ func MoveFile(source, destination string) error {
 }
 
 // PollFolder continuously reads files at a given interval
-func PollFolder(inDir string, outDir string, failedDir string, interval int, pattern string) {
+func (f  *FileInboundAdapter) PollFolder(inDir string, outDir string, failedDir string, interval int, pattern string) {
 	ticker := time.NewTicker(time.Duration(interval) * time.Second) // Ensures precise polling
 	defer ticker.Stop()
 
@@ -39,7 +39,7 @@ func PollFolder(inDir string, outDir string, failedDir string, interval int, pat
 		for _, file := range files {
 			//have to test is it safe to make go routines for each file arbitrarily
 			// A solution may be put a threshold (eg:- 100 files) and then make go routines for each file.If the number of files is greater than the threshold make only upper limit (threshold) of go routines
-			go ProcessFile(file)
+			go f.ProcessFile(file)
 		}
 
 		// Ensure accurate polling interval
@@ -50,13 +50,13 @@ func PollFolder(inDir string, outDir string, failedDir string, interval int, pat
 	}
 }
 
-func ProcessFile(file string) {
-	metadata, err := ReadFile(file)
+func (f *FileInboundAdapter) ProcessFile(file string) {
+	extractedFileData, err := ReadFile(file)
 	if err != nil {
 		log.Printf("Error reading file %s: %v", file, err)
 		return
 	}
-	
+	f.core.ReceiveRequests(extractedFileData)
 
 }
 
@@ -82,6 +82,7 @@ func ReadFile(filePath string) (*models.ExtractedFileData, error) {
 		Name:     info.Name(),
 		Size:     info.Size(),
 		FileType: filepath.Ext(filePath), // Get file extension
+		FilePath: filePath,
 	}
 
 	// Read file content
@@ -168,16 +169,16 @@ func scanDirectoryWithPattern(folderPath, pattern string) ([]string, error) {
 
 type CoreInterface interface {
 	//ReceiveRequests
-	ReceiveRequests()
+	ReceiveRequests(*models.ExtractedFileData)
 }
 
 type FileInboundAdapter struct{
 	models.Configurations
-	core *CoreInterface
+	core CoreInterface
 
 }
 
-func NewFileInboundAdapter(config models.Configurations, core *CoreInterface) *FileInboundAdapter {
+func NewFileInboundAdapter(config models.Configurations, core CoreInterface) *FileInboundAdapter {
 	return &FileInboundAdapter{
 		Configurations: config,
 		core: core,
@@ -186,7 +187,7 @@ func NewFileInboundAdapter(config models.Configurations, core *CoreInterface) *F
 
 func (f  *FileInboundAdapter) StartPolling() {
 	//start polling
-	PollFolder(f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval)
+	f.PollFolder(f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval, f.FileNamePattern)
 
 }
 
