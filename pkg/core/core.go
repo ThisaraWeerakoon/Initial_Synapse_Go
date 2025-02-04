@@ -15,17 +15,29 @@ type FileInboundAdapterInterface interface {
 }
 
 type Core struct {
-	fileInboundAdapter FileInboundAdapterInterface
+	FileInboundAdapter FileInboundAdapterInterface
 }
 
-func NewCore(fileInboundAdapter FileInboundAdapterInterface) *Core {
-	return &Core{
-		fileInboundAdapter: fileInboundAdapter,
-	}
+func NewCore() *Core {
+	return &Core{}
 }
 
+// func (c *Core) InitializeFileInboundAdapter() {
+// 	config := models.Configurations{
+// 		Interval:           10,
+// 		Sequential:         false,
+// 		Coordination:       true,
+// 		ActionAfterProcess: "MOVE",
+// 		MoveAfterProcess:   "file:///home/thisarar/user/test/out",
+// 		FileURI:            "file:///home/thisarar/user/test/in",
+// 		MoveAfterFailure:   "file:///home/thisarar/user/test/failed",
+// 		FileNamePattern:    "*.xml",
+// 		ContentType:        "text/xml",
+// 		ActionAfterFailure: "MOVE",
+// 	}
 
-
+// 	c.FileInboundAdapter = fileinboundadapter.NewFileInboundAdapter(config, c)
+// }
 
 func (c *Core) Run() {
 
@@ -43,8 +55,9 @@ func (c *Core) Run() {
 		ActionAfterFailure: "MOVE",
 	}
 
-	fileInboundAdapter := fileinboundadapter.NewFileInboundAdapter(config, c)
-	c.FileInboundAdapterRunner(fileInboundAdapter) //start the fileinboundadapter. There may be another adapters run concurrenctly after the full implementation of the core
+	//initialize the fileinboundadapter to core
+	c.FileInboundAdapter = fileinboundadapter.NewFileInboundAdapter(config, c)
+	c.FileInboundAdapterRunner(c.FileInboundAdapter) //start the fileinboundadapter. There may be another adapters run concurrenctly after the full implementation of the core
 
 }
 

@@ -38,7 +38,7 @@ func (c *Core) CoreProcess (extractedFileDataFromFileAdapter *models.ExtractedFi
 	processedMessageFromCore := c.MockParsing(extractedFileDataFromFileAdapter)
 
 	//send the results to the fileinboundadapter
-	c.fileInboundAdapter.ReceiveResults(
+	c.FileInboundAdapter.ReceiveResults(
 		processedMessageFromCore,
 	)
 }
