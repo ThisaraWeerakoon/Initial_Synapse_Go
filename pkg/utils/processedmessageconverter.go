@@ -5,8 +5,8 @@ import(
 )
 
 //This need to be changed later. This type of conversion is completely a result of our mock implementation of the core
-func ProcessedMessageConverter(extractedFileData models.ExtractedFileData,isSuccess bool) models.ProcessedMessage{
-	return models.ProcessedMessage{
+func ProcessedMessageConverter(extractedFileData models.ExtractedFileDataFromFileAdapter,isSuccess bool) models.ProcessedMessageFromCore{
+	return models.ProcessedMessageFromCore{
 		FilePath:extractedFileData.FilePath,
 		IsSuccess:isSuccess,
 	}

@@ -1,6 +1,6 @@
 package models
 
-type ExtractedFileData struct {
+type ExtractedFileDataFromFileAdapter struct {
 	FileMetadata
 	Context string
 }

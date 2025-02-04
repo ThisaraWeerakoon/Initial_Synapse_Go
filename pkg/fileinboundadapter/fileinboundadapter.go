@@ -62,7 +62,7 @@ func (f *FileInboundAdapter) ProcessFile(file string) {
 
 
 // ReadFile reads a file and returns metadata & content
-func ReadFile(filePath string) (*models.ExtractedFileData, error) {
+func ReadFile(filePath string) (*models.ExtractedFileDataFromFileAdapter, error) {
 	// Open the file
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -90,10 +90,10 @@ func ReadFile(filePath string) (*models.ExtractedFileData, error) {
 	if err != nil {
 		log.Printf("Error reading file %s: %v", filePath, err)
 		//return metadata, "", err
-		return &models.ExtractedFileData{FileMetadata: *metadata, Context: ""}, err
+		return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: ""}, err
 	}
 
-	return &models.ExtractedFileData{FileMetadata: *metadata, Context: string(content)}, nil
+	return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: string(content)}, nil
 }
 
 // Moves failed files from `test/in/` to `test/failed/`. test/failed/failed_files.txt contains the list of failed files.
@@ -169,7 +169,7 @@ func scanDirectoryWithPattern(folderPath, pattern string) ([]string, error) {
 
 type CoreInterface interface {
 	//ReceiveRequests
-	ReceiveRequests(*models.ExtractedFileData)
+	ReceiveRequests(*models.ExtractedFileDataFromFileAdapter)
 }
 
 type FileInboundAdapter struct{
@@ -191,7 +191,7 @@ func (f  *FileInboundAdapter) StartPolling() {
 
 }
 
-func (f  *FileInboundAdapter) ReceiveResults() {
+func (f  *FileInboundAdapter) ReceiveResults(processedMessageFromCore models.ProcessedMessageFromCore) {
 	//reveive results
 }
 
