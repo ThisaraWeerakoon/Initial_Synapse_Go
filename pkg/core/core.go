@@ -22,23 +22,6 @@ func NewCore() *Core {
 	return &Core{}
 }
 
-// func (c *Core) InitializeFileInboundAdapter() {
-// 	config := models.Configurations{
-// 		Interval:           10,
-// 		Sequential:         false,
-// 		Coordination:       true,
-// 		ActionAfterProcess: "MOVE",
-// 		MoveAfterProcess:   "file:///home/thisarar/user/test/out",
-// 		FileURI:            "file:///home/thisarar/user/test/in",
-// 		MoveAfterFailure:   "file:///home/thisarar/user/test/failed",
-// 		FileNamePattern:    "*.xml",
-// 		ContentType:        "text/xml",
-// 		ActionAfterFailure: "MOVE",
-// 	}
-
-// 	c.FileInboundAdapter = fileinboundadapter.NewFileInboundAdapter(config, c)
-// }
-
 func (c *Core) Run() {
 
 	//start the fileinboundadapter. But this start should be more generic and user need to configure the configurations.Here I hardcoded the configurations

@@ -56,7 +56,10 @@ func (f *FileInboundAdapter) ProcessFile(file string) {
 		log.Printf("Error reading file %s: %v", file, err)
 		return
 	}
-	f.core.ReceiveRequests(extractedFileData)
+
+	//Attention : Here I implemented considering same reading go routine taking care the receiving results and it is needed to reconsider the design. Here the design is simpple but think the situation where some of the processed results of the previous iteration coming and there might be not enough threads.
+	f.CallCore(*extractedFileData) //Finally f.ReceiveRequests() is called
+
 
 }
 
@@ -191,13 +194,40 @@ func (f  *FileInboundAdapter) StartPolling() {
 
 }
 
-func (f  *FileInboundAdapter) ReceiveResults(processedMessageFromCore models.ProcessedMessageFromCore) {
+//After receiving the results from core this function will move the file if it's success or write to failed_files.txt if it's failure
+func (f  *FileInboundAdapter) ReceiveResults(processedMessageFromCore models.ProcessedMessageFromCore){
 	//reveive results
+	if processedMessageFromCore.IsSuccess {
+		// Move file to success directory
+		err := MoveFile(processedMessageFromCore.FilePath, f.MoveAfterProcess)
+		if err != nil {
+			log.Printf("Error moving file %s to %s: %v", processedMessageFromCore.FilePath, f.MoveAfterProcess, err)
+		} else {
+			fmt.Printf("Moved %s to %s\n", processedMessageFromCore.FilePath, f.MoveAfterProcess)
+		}
+	} else {
+		// Write to failed_files.txt
+		failedFilePath := filepath.Join(f.MoveAfterFailure, "failed_files.txt")
+		file, err := os.OpenFile(failedFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Printf("Error opening failed_files.txt: %v", err)
+			return
+		}
+		defer file.Close()
+
+		if _, err := file.WriteString(processedMessageFromCore.FilePath + "\n"); err != nil {
+			log.Printf("Error writing to failed_files.txt: %v", err)
+		} else {
+			fmt.Printf("Wrote %s to failed_files.txt\n", processedMessageFromCore.FilePath)
+		}
+	}
+
 }
 
 func (f  *FileInboundAdapter) Start() {
 	//start polling
 	go f.StartPolling() //used go routine since there may be another functionalities in fileinbound in furture improvements
+	// go f.ReceiveResults() //used go routine since there may be another functionalities in fileinbound in furture improvements
 
 }
 
