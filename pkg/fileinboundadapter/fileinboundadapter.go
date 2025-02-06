@@ -9,6 +9,8 @@ import (
 	"io"
 	"bufio"
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
+	"context"
+	"sync"
 )
 
 // MoveFile moves a file from source to destination.
@@ -188,7 +190,9 @@ func NewFileInboundAdapter(config models.Configurations, core CoreInterface) *Fi
 	}
 }
 
-func (f  *FileInboundAdapter) StartPolling() {
+func (f  *FileInboundAdapter) StartPolling(ctx context.Context, parentWg *sync.WaitGroup) {
+	defer parentWg.Done()
+	
 	//start polling
 	f.PollFolder(f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval, f.FileNamePattern)
 
@@ -224,9 +228,11 @@ func (f  *FileInboundAdapter) ReceiveResults(processedMessageFromCore models.Pro
 
 }
 
-func (f  *FileInboundAdapter) Start() {
+func (f  *FileInboundAdapter) Start(ctx context.Context, parentWg *sync.WaitGroup) {
+	defer parentWg.Done()
+	var wg sync.WaitGroup
 	//start polling
-	go f.StartPolling() //used go routine since there may be another functionalities in fileinbound in furture improvements
+	go f.StartPolling(ctx,&wg) //used go routine since there may be another functionalities in fileinbound in furture improvements
 	// go f.ReceiveResults() //used go routine since there may be another functionalities in fileinbound in furture improvements
 
 }

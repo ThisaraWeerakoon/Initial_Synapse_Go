@@ -10,9 +10,5 @@ import (
 func main () {
 	core := core.NewCore()
 	core.Run()
-
-
-	
-
 }
 

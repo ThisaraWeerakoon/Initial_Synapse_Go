@@ -4,11 +4,13 @@ package core
 import (
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/fileinboundadapter"
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
+	"context"
+	"sync"
 )
 
 type FileInboundAdapterInterface interface {
 	//start polling
-	Start()
+	Start(ctx context.Context, parentWg *sync.WaitGroup)
 	//reveive results
 	ReceiveResults(processedMessageFromCore models.ProcessedMessageFromCore)
 	//stop process
