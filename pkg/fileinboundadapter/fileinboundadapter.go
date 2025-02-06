@@ -1,31 +1,19 @@
 package fileinboundadapter
 
 import (
-	"time"
-	"os"
-	"fmt"
-	"log"
-	"path/filepath"
-	"io"
 	"bufio"
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
 	"context"
+	"fmt"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
 	"sync"
+	"syscall"
+	"time"
+
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
 )
-
-// // MoveFile moves a file from source to destination.
-// func MoveFile(source, destination string) error {
-// 	// Check if the destination is a directory
-// 	info, err := os.Stat(destination)
-// 	if err == nil && info.IsDir() {
-// 		// Extract the filename from the source path
-// 		filename := filepath.Base(source)
-// 		// Append the filename to the destination directory
-// 		destination = filepath.Join(destination, filename)
-// 	}
-
-// 	return os.Rename(source, destination)
-// }
 
 // PollFolder continuously reads files at a given interval
 func (f  *FileInboundAdapter) PollFolder(ctx context.Context,inDir string, outDir string, failedDir string, interval int, pattern string) {
@@ -80,8 +68,7 @@ func (f *FileInboundAdapter) ProcessFile(ctx context.Context,parentWg *sync.Wait
 
 }
 
-
-// ReadFile reads a file and returns metadata & content
+// ReadFile reads a file, returns metadata & content, and locks the file after reading.
 func ReadFile(filePath string) (*models.ExtractedFileDataFromFileAdapter, error) {
 	// Open the file
 	file, err := os.Open(filePath)
@@ -90,6 +77,13 @@ func ReadFile(filePath string) (*models.ExtractedFileDataFromFileAdapter, error)
 		return nil, err
 	}
 	defer file.Close()
+
+	// Lock the file to prevent modifications
+	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX) // Exclusive lock
+	if err != nil {
+		log.Printf("Error locking file %s: %v", filePath, err)
+		return nil, err
+	}
 
 	// Get file metadata
 	info, err := file.Stat()
@@ -109,12 +103,13 @@ func ReadFile(filePath string) (*models.ExtractedFileDataFromFileAdapter, error)
 	content, err := io.ReadAll(file)
 	if err != nil {
 		log.Printf("Error reading file %s: %v", filePath, err)
-		//return metadata, "", err
 		return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: ""}, err
 	}
 
+	// File remains locked until the function returns
 	return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: string(content)}, nil
 }
+
 
 // Moves failed files from `test/in/` to `test/failed/`. test/failed/failed_files.txt contains the list of failed files.
 func processFailedFiles(inDir, failedDir string) {
