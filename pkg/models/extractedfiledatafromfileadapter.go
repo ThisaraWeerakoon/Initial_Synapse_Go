@@ -1,6 +1,7 @@
 package models
 
+//In original code this is FileObject
 type ExtractedFileDataFromFileAdapter struct {
-	FileMetadata
+	ContextHeader
 	Context string
 }
