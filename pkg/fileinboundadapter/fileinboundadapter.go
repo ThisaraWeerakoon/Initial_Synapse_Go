@@ -13,10 +13,19 @@ import (
 	"sync"
 )
 
-// MoveFile moves a file from source to destination.
-func MoveFile(source, destination string) error {
-	return os.Rename(source, destination)
-}
+// // MoveFile moves a file from source to destination.
+// func MoveFile(source, destination string) error {
+// 	// Check if the destination is a directory
+// 	info, err := os.Stat(destination)
+// 	if err == nil && info.IsDir() {
+// 		// Extract the filename from the source path
+// 		filename := filepath.Base(source)
+// 		// Append the filename to the destination directory
+// 		destination = filepath.Join(destination, filename)
+// 	}
+
+// 	return os.Rename(source, destination)
+// }
 
 // PollFolder continuously reads files at a given interval
 func (f  *FileInboundAdapter) PollFolder(ctx context.Context,inDir string, outDir string, failedDir string, interval int, pattern string) {
