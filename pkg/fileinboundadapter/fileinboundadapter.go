@@ -4,12 +4,10 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"sync"
-	"syscall"
 	"time"
 
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
@@ -67,49 +65,6 @@ func (f *FileInboundAdapter) ProcessFile(ctx context.Context,parentWg *sync.Wait
 
 
 }
-
-// ReadFile reads a file, returns metadata & content, and locks the file after reading.
-func ReadFile(filePath string) (*models.ExtractedFileDataFromFileAdapter, error) {
-	// Open the file
-	file, err := os.Open(filePath)
-	if err != nil {
-		log.Printf("Error opening file %s: %v", filePath, err)
-		return nil, err
-	}
-	defer file.Close()
-
-	// Lock the file to prevent modifications
-	err = syscall.Flock(int(file.Fd()), syscall.LOCK_EX) // Exclusive lock
-	if err != nil {
-		log.Printf("Error locking file %s: %v", filePath, err)
-		return nil, err
-	}
-
-	// Get file metadata
-	info, err := file.Stat()
-	if err != nil {
-		log.Printf("Error getting file info for %s: %v", filePath, err)
-		return nil, err
-	}
-
-	metadata := &models.FileMetadata{
-		Name:     info.Name(),
-		Size:     info.Size(),
-		FileType: filepath.Ext(filePath), // Get file extension
-		FilePath: filePath,
-	}
-
-	// Read file content
-	content, err := io.ReadAll(file)
-	if err != nil {
-		log.Printf("Error reading file %s: %v", filePath, err)
-		return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: ""}, err
-	}
-
-	// File remains locked until the function returns
-	return &models.ExtractedFileDataFromFileAdapter{FileMetadata: *metadata, Context: string(content)}, nil
-}
-
 
 // Moves failed files from `test/in/` to `test/failed/`. test/failed/failed_files.txt contains the list of failed files.
 func processFailedFiles(inDir, failedDir string) {
