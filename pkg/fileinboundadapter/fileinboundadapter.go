@@ -19,7 +19,10 @@ func MoveFile(source, destination string) error {
 }
 
 // PollFolder continuously reads files at a given interval
-func (f  *FileInboundAdapter) PollFolder(inDir string, outDir string, failedDir string, interval int, pattern string) {
+func (f  *FileInboundAdapter) PollFolder(ctx context.Context,inDir string, outDir string, failedDir string, interval int, pattern string) {
+	newCtx, cancel := context.WithCancel(ctx)
+	var wg sync.WaitGroup
+	defer cancel()
 	ticker := time.NewTicker(time.Duration(interval) * time.Second) // Ensures precise polling
 	defer ticker.Stop()
 
@@ -39,9 +42,10 @@ func (f  *FileInboundAdapter) PollFolder(inDir string, outDir string, failedDir 
 
 		// Process each file
 		for _, file := range files {
+			wg.Add(1)
 			//have to test is it safe to make go routines for each file arbitrarily
 			// A solution may be put a threshold (eg:- 100 files) and then make go routines for each file.If the number of files is greater than the threshold make only upper limit (threshold) of go routines
-			go f.ProcessFile(file)
+			go f.ProcessFile(newCtx,&wg,file)
 		}
 
 		// Ensure accurate polling interval
@@ -50,9 +54,11 @@ func (f  *FileInboundAdapter) PollFolder(inDir string, outDir string, failedDir 
 			time.Sleep(time.Duration(interval)*time.Second - elapsed)
 		}
 	}
+	wg.Wait()
 }
 
-func (f *FileInboundAdapter) ProcessFile(file string) {
+func (f *FileInboundAdapter) ProcessFile(ctx context.Context,parentWg *sync.WaitGroup,file string) {
+	defer parentWg.Done()
 	extractedFileData, err := ReadFile(file)
 	if err != nil {
 		log.Printf("Error reading file %s: %v", file, err)
@@ -192,9 +198,9 @@ func NewFileInboundAdapter(config models.Configurations, core CoreInterface) *Fi
 
 func (f  *FileInboundAdapter) StartPolling(ctx context.Context, parentWg *sync.WaitGroup) {
 	defer parentWg.Done()
-	
+
 	//start polling
-	f.PollFolder(f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval, f.FileNamePattern)
+	f.PollFolder(ctx,f.FileURI, f.MoveAfterProcess, f.MoveAfterFailure, f.Interval, f.FileNamePattern)
 
 }
 
@@ -231,9 +237,13 @@ func (f  *FileInboundAdapter) ReceiveResults(processedMessageFromCore models.Pro
 func (f  *FileInboundAdapter) Start(ctx context.Context, parentWg *sync.WaitGroup) {
 	defer parentWg.Done()
 	var wg sync.WaitGroup
+	newCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	wg.Add(1)
 	//start polling
-	go f.StartPolling(ctx,&wg) //used go routine since there may be another functionalities in fileinbound in furture improvements
+	go f.StartPolling(newCtx,&wg) //used go routine since there may be another functionalities in fileinbound in furture improvements
 	// go f.ReceiveResults() //used go routine since there may be another functionalities in fileinbound in furture improvements
+	wg.Wait()
 
 }
 

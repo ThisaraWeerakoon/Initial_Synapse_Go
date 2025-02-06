@@ -11,4 +11,5 @@ func (c *Core) FileInboundAdapterRunner(fileInboundAdapterInterface FileInboundA
 	defer cancel()
 	wg.Add(1)
 	go fileInboundAdapterInterface.Start(ctx, &wg)
+	wg.Wait()
 }
