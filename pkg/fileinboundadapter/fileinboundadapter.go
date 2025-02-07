@@ -113,7 +113,14 @@ func processFailedFiles(inDir, failedDir string) {
 
 
 // Scan a directory and return the list of files matching the given pattern
-func scanDirectoryWithPattern(folderPath, pattern string) ([]string, error) {
+func scanDirectoryWithPattern(folderURI, pattern string) ([]string, error) {
+	// Convert file URI to absolute file path
+	folderPath, err := ConvertFileURIToPath(folderURI)
+	if err != nil {
+		log.Printf("Error converting file URI to path: %v", err)
+		return nil, err
+	}
+	
 	var files []string
 
 	entries, err := os.ReadDir(folderPath)
