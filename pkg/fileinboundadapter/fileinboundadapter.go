@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/models"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
 )
 
 // PollFolder continuously reads files at a given interval
