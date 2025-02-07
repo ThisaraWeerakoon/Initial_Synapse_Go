@@ -2,8 +2,8 @@
 package core
 
 import (
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/fileinboundadapter"
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/models"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/fileinboundadapter"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/models"
 	"context"
 	"sync"
 )

@@ -1,3 +1,3 @@
-module github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint
+module FileInboundEndpoint
 
 go 1.23.4
