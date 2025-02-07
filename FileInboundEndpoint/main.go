@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/pkg/core"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/core"
 	
 
 )
