@@ -1,7 +1,7 @@
 package fileinboundadapter
 
 import(
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/models"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/models"
 	"io"
 	"log"
 	"os"

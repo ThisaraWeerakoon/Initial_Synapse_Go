@@ -4,8 +4,8 @@ package core
 import (
 	"math/rand"
 	"time"
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/models"
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/pkg/utils"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/models"
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/FileInboundEndpoint/utils"
 )
 
 //After receiving the data from file adapter initialize the CoreProcess which completes up to sending the results to the core. 
