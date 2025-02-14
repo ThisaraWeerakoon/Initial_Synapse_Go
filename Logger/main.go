@@ -3,6 +3,7 @@ package main
 import (
 	carbonconsolelogging "github.com/ThisaraWeerakoon/Initial_Synapse_Go/Logger/pkg/CarbonConsole"
 	carbonlogfilezaplamberjack "github.com/ThisaraWeerakoon/Initial_Synapse_Go/Logger/pkg/CarbonLogfile"
+	carbonlogfilewithoutrotatelogs "github.com/ThisaraWeerakoon/Initial_Synapse_Go/Logger/pkg/CarbonLogfilewithoutrotatelogs"
 )
 func main() {
 	// This is the main function for the Logger application.
@@ -11,6 +12,9 @@ func main() {
 	carbonconsolelogging.CarbonConsoleLoggingRunner()
 
 	//CarbonLogfileZapLamberjack
-	carbonlogfilezaplamberjack.CarbonLogfileZapLamberjackRuner()
+	carbonlogfilezaplamberjack.CarbonLogfileRotatelogsRuner()
+
+	//CarbonLogfilewithoutRotatelogs
+	carbonlogfilewithoutrotatelogs.CarbonLogfileWithoutRotatelogs()
 
 }

@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-func CarbonLogfileZapLamberjackRuner() {
+func CarbonLogfileRotatelogsRuner() {
 	logger, err := initCarbonLogfileLogger()
 	if err != nil {
 		log.Fatalf("Failed to initialize logger: %v", err)

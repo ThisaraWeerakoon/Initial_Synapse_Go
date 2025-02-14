@@ -66,3 +66,62 @@ func initConsoleLogger() {
 // appender.CARBON_CONSOLE.layout.pattern = [%d] %5p {%c{1}} - %m%ex%n
 // appender.CARBON_CONSOLE.filter.threshold.type = ThresholdFilter
 // appender.CARBON_CONSOLE.filter.threshold.level = DEBUG
+
+
+// Zap code for the same:
+
+// package main
+
+// import (
+//     "fmt"
+//     "os"
+//     "strings"
+//     "time"
+
+//     "go.uber.org/zap"
+//     "go.uber.org/zap/zapcore"
+// )
+
+// // CustomTimeEncoder formats the time as [YYYY-MM-DD HH:MM:SS]
+// func CustomTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+//     enc.AppendString(fmt.Sprintf("[%s]", t.Format("2006-01-02 15:04:05")))
+// }
+
+// // PaddedLevelEncoder pads the level to 5 characters
+// func PaddedLevelEncoder(level zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+//     enc.AppendString(fmt.Sprintf("%-5s", level.CapitalString()))
+// }
+
+// // ShortCallerEncoder logs the last segment of the caller
+// func ShortCallerEncoder(caller zapcore.EntryCaller, enc zapcore.PrimitiveArrayEncoder) {
+//     parts := strings.Split(caller.TrimmedPath(), "/")
+//     enc.AppendString(fmt.Sprintf("{%s}", parts[len(parts)-1]))
+// }
+
+// func main() {
+//     encoderConfig := zapcore.EncoderConfig{
+//         TimeKey:        "time",
+//         LevelKey:       "level",
+//         NameKey:        "logger",
+//         CallerKey:      "caller",
+//         MessageKey:     "msg",
+//         StacktraceKey:  "stacktrace",
+//         LineEnding:     zapcore.DefaultLineEnding,
+//         EncodeTime:     CustomTimeEncoder,
+//         EncodeLevel:    PaddedLevelEncoder,
+//         EncodeCaller:   ShortCallerEncoder,
+//         EncodeName:     zapcore.FullNameEncoder,
+//     }
+
+//     core := zapcore.NewCore(
+//         zapcore.NewConsoleEncoder(encoderConfig),
+//         zapcore.AddSync(os.Stdout),
+//         zap.DebugLevel,
+//     )
+
+//     logger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+
+//     logger.Debug("This is a debug message.")
+//     logger.Info("This is an info message.")
+//     logger.Error("This is an error message.")
+// }
