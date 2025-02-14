@@ -1,4 +1,4 @@
-package carbonconsolelogging
+package carbonconsole
 
 import (
 	"github.com/sirupsen/logrus"
