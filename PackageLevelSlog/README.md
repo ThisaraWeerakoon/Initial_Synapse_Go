@@ -1,0 +1,1 @@
+Sample for implementing packagelevel logging using slog only. Initialize different loggers for different packages. Logger is initialized for each package in a init() function. There is no option to configure the log level during runtime.

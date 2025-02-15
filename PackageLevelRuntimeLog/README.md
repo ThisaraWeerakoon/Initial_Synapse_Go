@@ -1,0 +1,1 @@
+Package level logging. Zap and zapfilter. Used zapfilter to read the logging configuration. Logging configuration is writtern in zapfilter based language. In configuration, we can define log levels for the specific logger name. Then after initilizing the logger during runtime, zapfilter can find and map the relevant log levels for the name of the logger.

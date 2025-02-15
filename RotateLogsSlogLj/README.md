@@ -1,0 +1,1 @@
+Sample for file rotating using slog and lamberjack

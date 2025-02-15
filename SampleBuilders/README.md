@@ -1,0 +1,1 @@
+Different builders (xml,json and other mime types supported by current synapse)
