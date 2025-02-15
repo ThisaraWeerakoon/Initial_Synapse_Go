@@ -1,0 +1,16 @@
+{"level":"info","ts":1739601285.1085894,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a","msg":"info message from package a"}
+{"level":"warn","ts":1739601285.1086183,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a","msg":"warn message from package a"}
+{"level":"error","ts":1739601285.1086266,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a","msg":"error message from package a"}
+{"level":"warn","ts":1739601285.1173337,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b","msg":"warn message from package b"}
+{"level":"error","ts":1739601285.1173594,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b","msg":"error message from package b"}
+{"level":"info","ts":1739601285.1189008,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c","msg":"info message from package a/c"}
+{"level":"warn","ts":1739601285.1189232,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c","msg":"warn message from package a/c"}
+{"level":"error","ts":1739601285.118938,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c","msg":"error message from package a/c"}
+{"level":"debug","ts":1739601285.12027,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b/d","msg":"debug message from package b/d"}
+{"level":"info","ts":1739601285.1202903,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b/d","msg":"info message from package b/d"}
+{"level":"warn","ts":1739601285.1203065,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b/d","msg":"warn message from package b/d"}
+{"level":"error","ts":1739601285.120315,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b/d","msg":"error message from package b/d"}
+{"level":"debug","ts":1739601285.1217072,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c/e","msg":"debug message from package a/c/e"}
+{"level":"info","ts":1739601285.1217227,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c/e","msg":"info message from package a/c/e"}
+{"level":"warn","ts":1739601285.121731,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c/e","msg":"warn message from package a/c/e"}
+{"level":"error","ts":1739601285.1217437,"logger":"github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c/e","msg":"error message from package a/c/e"}

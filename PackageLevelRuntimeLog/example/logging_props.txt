@@ -1,0 +1,5 @@
+info,warn,error:github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a
+warn,error:github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b*
+info,warn,error:github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c
+debug,info,warn,error:github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/a/c/e
+*:github.com/ThisaraWeerakoon/Initial_Synapse_Go/PackageLevelRuntimeLog/example/b/d
