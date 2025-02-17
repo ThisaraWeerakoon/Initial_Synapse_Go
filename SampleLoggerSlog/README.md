@@ -1,0 +1,1 @@
+This demonstrates a sample implementation of how to read the configurations from a configuration file. Packagelevel logging configurations have been included those files. Then when we change the configuration file, the package level loggings are changed during the runtime.
