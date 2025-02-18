@@ -1,4 +1,4 @@
 {
-    "packageA": "DEBUG",
+    "packageA": "INFO",
     "packageB": "DEBUG"
 }

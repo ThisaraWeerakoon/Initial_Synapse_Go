@@ -13,10 +13,13 @@ var packageBLogger *models.CustomLogger
 
 func init() {
 	packageBLogger = logger.InitializeLogger("packageB")
+	logger.RegisterLogger("packageB", packageBSetLevel{}) // Register
 }
 
-func SetLevel(k *koanf.Koanf) {
-	packageBLogger.SetLevel(k, "packageA")
+type packageBSetLevel struct{}
+
+func (p packageBSetLevel) SetLevel(k *koanf.Koanf, name string) {
+    packageBLogger.SetLevel(k, name)
 }
 
 func PackageBFunction() {

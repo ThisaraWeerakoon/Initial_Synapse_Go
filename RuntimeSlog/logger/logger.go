@@ -9,7 +9,13 @@ import (
 	"github.com/knadh/koanf/providers/file"
 
         "github.com/ThisaraWeerakoon/Initial_Synapse_Go/RuntimeSlog/models"
+
 )
+
+// Define an interface for setting log levels.
+type LogLevelSetter interface {
+        SetLevel(k *koanf.Koanf, name string)
+}
 
 // Global koanf instance.
 var k = koanf.New(".")
@@ -18,9 +24,9 @@ var currentK = koanf.New(".")
 
 var koanfChan = make(chan *koanf.Koanf)
 
-func init() {
+var loggers = make(map[string]LogLevelSetter) // Store LogLevelSetters
 
-        
+func init() {
 
         go notifier(koanfChan)
         // file reader
@@ -57,8 +63,24 @@ func init() {
 
 }
 
+func RegisterLogger(name string, setter LogLevelSetter) {
+        loggers[name] = setter
+}
+    
+
 func InitializeLogger(name string) *models.CustomLogger {
-        packageALogger := models.CustomLogger{}
-        packageALogger.SetLevel(k, name)
-        return &packageALogger
+        customLogger := models.CustomLogger{}
+        customLogger.SetLevel(k, name) // Initial level set
+        return &customLogger
+}
+
+func notifier(dataChan <-chan *koanf.Koanf) {
+        for newK := range koanfChan {
+                for name, setter := range loggers {
+                        if newK.String(name) != currentK.String(name) {
+                                setter.SetLevel(newK, name)
+                        }
+                }
+                currentK = newK // Update currentK after processing all loggers
+        }
 }
