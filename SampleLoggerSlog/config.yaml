@@ -1,0 +1,4 @@
+packages:
+    packageA: DEBUG
+    packageB: INFO
+    packageC: WARN
