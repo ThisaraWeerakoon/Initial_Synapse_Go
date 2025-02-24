@@ -1,0 +1,1 @@
+Sample implementation of centralized logger using slog for logging and koanf for reading the configuration files.
