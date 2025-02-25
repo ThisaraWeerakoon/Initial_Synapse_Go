@@ -9,14 +9,10 @@ import (
 )
 
 func main() {
-
 	for{
 		fmt.Println("...............Starting the loop...............")
 		packageA.PackageAFunction()
 		packageB.PackageBFunction()
 		time.Sleep(5*time.Second)
 	}
-
-
-
 }
