@@ -1,23 +1,30 @@
 package main
 
 import (
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/config"
-	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/logger"
+	// "github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/config"
+	// "github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/logger"
+	"time"
+
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/packageA"
 )
 
 func main() {
-	   //Initialize config
-        cfg, err := config.New("config.toml")
-        if err != nil {
-            panic(err)
-        }
+	//    //Initialize config
+    //     cfg, err := config.New("config.toml")
+    //     if err != nil {
+    //         panic(err)
+    //     }
 
 
 		// //Initialize logger
-    	foo := logger.NewMappedLogger(cfg)
+        // logger.InitializeLogger(cfg)
 
-		packageA.DoSomethingA()
+    	// foo := logger.NewMappedLogger(cfg)
+        for{
+            packageA.DoSomethingA()
+            time.Sleep(10 * time.Second)
+        }
+
 
         // a.DoSomethingA()
         // b.DoSomethingB()

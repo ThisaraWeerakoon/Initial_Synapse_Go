@@ -12,6 +12,16 @@ import (
 	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/CentralizedSlogKoanfRuntimeLog/pkg/config"
 )
 
+func init() {
+    	//Initialize config
+        cfg, err := config.New("config.toml")
+        if err != nil {
+            panic(err)
+        }
+        InitializeLogger(cfg)
+    // InitializeLogger("packageA")
+}
+
 type RootLogger struct {
 
         config *config.Config

@@ -4,7 +4,7 @@
 log_level = "info"  # Can be: debug, info, warn, error
 
 [log_levels]
-packageA = "debug"   # Package-specific level for packageA
+packageA = "warn"   # Package-specific level for packageA
 packageB = "warn"    # Package-specific level for packageB
 packageC = "error"   # Package-specific level for packageC
 # other_package = "info"  # Example for another package
