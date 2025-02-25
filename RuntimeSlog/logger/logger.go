@@ -63,14 +63,16 @@ func init() {
 
 }
 
-func RegisterLogger(name string, setter LogLevelSetter) {
-        loggers[name] = setter
-}
+// func RegisterLogger(name string, setter LogLevelSetter) {
+//         loggers[name] = setter
+// }
     
 
 func InitializeLogger(name string) *models.CustomLogger {
         customLogger := models.CustomLogger{}
         customLogger.SetLevel(k, name) // Initial level set
+
+        loggers[name] = &customLogger // Store the logger
         return &customLogger
 }
 
