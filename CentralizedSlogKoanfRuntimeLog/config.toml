@@ -1,0 +1,25 @@
+# config.toml
+
+# Global log level (default if package-specific level is not defined)
+log_level = "info"  # Can be: debug, info, warn, error
+
+[log_levels]
+packageA = "debug"   # Package-specific level for packageA
+packageB = "warn"    # Package-specific level for packageB
+packageC = "error"   # Package-specific level for packageC
+# other_package = "info"  # Example for another package
+
+# You can add other configurations here as needed for your application.
+# For example:
+
+# database = {
+#   host = "localhost"
+#   port = 5432
+#   user = "postgres"
+#   password = "your_password"
+# }
+
+# api = {
+#   key = "your_api_key"
+#   rate_limit = 1000
+# }

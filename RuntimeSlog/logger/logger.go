@@ -75,7 +75,7 @@ func InitializeLogger(name string) *models.CustomLogger {
 }
 
 func notifier(dataChan <-chan *koanf.Koanf) {
-        for newK := range koanfChan {
+        for newK := range dataChan {
                 for name, setter := range loggers {
                         if newK.String(name) != currentK.String(name) {
                                 setter.SetLevel(newK, name)
