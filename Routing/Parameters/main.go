@@ -7,16 +7,17 @@ import (
 
 func main() {
         mux := http.NewServeMux()
-        mux.HandleFunc("/product/{id}", func(w http.ResponseWriter, r *http.Request) {
+        mux.HandleFunc("/product/{id}/orders/{orderId}", func(w http.ResponseWriter, r *http.Request) {
 
 				// Accessing the path parameter (e.g., "id")
                 productId := r.PathValue("id")
+				orderId := r.PathValue("orderId")
                 queryParams := r.URL.Query()
 
                 // Accessing a specific query parameter (e.g., "color")
                 color := queryParams.Get("color")
 
-                fmt.Fprintf(w, "displaying properties for product %s\n", productId)
+                fmt.Fprintf(w, "displaying properties for product %s order %s\n", productId, orderId)
                 if color != "" {
                         fmt.Fprintf(w, "Color: %s\n", color)
                 }
