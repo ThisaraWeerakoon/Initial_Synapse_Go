@@ -7,6 +7,7 @@ import (
 
 func main() {
         mux := http.NewServeMux()
+        
         mux.HandleFunc("/product/{id}/orders/{orderId}", func(w http.ResponseWriter, r *http.Request) {
 
 				// Accessing the path parameter (e.g., "id")

@@ -33,3 +33,11 @@ func main() {
 }
 
 
+// regex 
+// performance
+
+
+//gin
+
+
+/api/v1/department/1/employee/2

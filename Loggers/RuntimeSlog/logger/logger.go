@@ -1,15 +1,15 @@
 package logger
 
 import (
-        "log/slog"
-        "os"
+	"fmt"
+	"log/slog"
+	"os"
 
-        "github.com/knadh/koanf/v2"
 	"github.com/knadh/koanf/parsers/json"
 	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 
-        "github.com/ThisaraWeerakoon/Initial_Synapse_Go/RuntimeSlog/models"
-
+	"github.com/ThisaraWeerakoon/Initial_Synapse_Go/RuntimeSlog/models"
 )
 
 // Define an interface for setting log levels.
@@ -27,7 +27,7 @@ var koanfChan = make(chan *koanf.Koanf)
 var loggers = make(map[string]LogLevelSetter) // Store LogLevelSetters
 
 func init() {
-
+        fmt.Println("Logger init")
         go notifier(koanfChan)
         // file reader
         f := file.Provider("conf.json")
