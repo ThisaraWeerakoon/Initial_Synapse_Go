@@ -1,0 +1,114 @@
+idp:
+  # +optional k8s resource this component is matched to. Acceptable values are Deployment, Job, StatefulSet.
+  # +required Client id used for authentication
+  clientId: choreoclientid
+  # +required Client secret used for authentication
+  clientSecret: ${IDP_CLIENT_SECRET}
+  # +required Token endpoint of the idp 
+  tokenUrl: https://idp.example.com/oauth2/token
+  # +required List of allowed redirect urls for the auth flow
+  redirectUrls:
+  - http://localhost:9000/
+  # +required Jwks information used for jwt validation - DEPRECATED. use 'idp.jwtProviders' instead. 
+  jwks:
+    # +required Jwks endpoint of the idp
+    url: https://idp.example.com/oauth2/jwks
+    # +required Refresh interval of the jwt cache.
+    cacheRefreshInterval: 1h
+    # +required Expiry for the cached key. This should be grater than idp.jwks.cacheRefreshInterval.
+    cacheTtl: 12h
+  # +required List of JWT provider information used for jwt validation
+  jwtProviders:
+    # +required Jwt Issuer name for this JWKS endpoint. This is used to map the JWKS endpoint with the correct issuer.
+  - issuer: https://idp.example.com/oauth2/token
+    # +required List of audiences where JWT is issued to
+    audiences:
+    - choreolocalportal
+    # +required JWKS endpoint configuration for the issuer. One of `jwks` or `publicKey` should be specified
+    # If both jwks and publicKey provided, the priority is given to the publicKey
+    jwks:
+      # +required Jwks endpoint of the idp
+      url: https://idp.example.com/oauth2/jwks
+      # +required Refresh interval of the jwt cache.
+      cacheRefreshInterval: 1h
+      # +required Expiry for the cached key. This should be grater than the cacheRefreshInterval.
+      cacheTtl: 12h
+    # +required Base64 encoded public key of the signed JWT. One of `jwks` or `publicKey` should be specified
+    # If both jwks and publicKey provided, the priority is given to the publicKey
+    publicKey: 37...fMg0=
+    # +optional Skips JWT claim validation for this provider. Defaults to false
+    skipClaimsValidation: false
+    # +optional Skips JWT signature validation for this provider. Defaults to false
+    skipSignatureValidation: false
+  # +required Jwt Issuer used in jwt validation - DEPRECATED. use 'idp.jwtProviders' instead. 
+  issuer: https://idp.example.com/oauth2/token
+  # +required Jwt Issuers used in jwt validation - DEPRECATED. use 'idp.jwtProviders' instead. 
+  issuers: 
+    - https://idp.example.com/oauth2/token
+  # +This is the audience to which the JWT is intended - DEPRECATED. use 'idp.jwtProviders' instead. 
+  audience:
+    - choreolocalportal
+  # +optional Leeway used in jwt time validations due to time drift. Can be + or -
+  jwtValidationLeeway: 5s
+  # +optional Ignores the Jwt validation
+  skipJwtValidation: false
+  # +required Cookie configurations
+  cookies:
+    # +optional Max age for the cookie. Defaults to 0. See https://tools.ietf.org/html/rfc6265#section-4.1.2.2
+    maxAge: 86400
+    # +optional Enable secure cookies. Defaults to false. See https://tools.ietf.org/html/rfc6265#section-4.1.2.5
+    secure: false
+    # +optional Enable httpOnly cookies. Defaults to false. See https://tools.ietf.org/html/rfc6265#section-4.1.2.6
+    httpOnly: true
+auth:
+  # +optional Enable authentication flow. Defaults to false. Setting this to false may impact on user and org management.
+  enable: true
+# +optional Server middleware configurations
+middleware:
+  # +optional Logging middleware configurations
+  logging:
+    # +optional Log request body. Defaults to false
+    dumpRequestBody: true
+    # +optional Log request headers. Defaults to false
+    dumpRequestHeaders: true
+    # +optional Log response body. Defaults to false
+    dumpResponseBody: true
+    # +optional Log response headers. Defaults to false
+    dumpResponseHeaders: true
+    # +optional Set the base64 encoded ed25519 public key for encrypting headers and body content.
+    # if you did not specify a public key, the logger will write everything in plain text.
+    publicKey: 37...fMg0=
+# +required Service addresses of other components
+upstream:
+  app-service: app-service:8080
+  limiter: quota-limiter:9090
+  dp-rudder: dp-rudder:80
+  dp-project-manager: dp-project-manager:80
+  dp-cicd: dp-cicd:80
+  organization-management: organization-management:80
+  authz-service: authz-service:80
+# +optional Custom logging configuration. See https://godoc.org/go.uber.org/zap#Config
+logger:
+  level: info
+  encoding: console
+  development: true
+  disableStacktrace: false
+  encoderConfig:
+    timeKey: time
+    levelKey: level
+    nameKey: logger
+    callerKey: caller
+    messageKey: message
+    stacktraceKey: stacktrace
+    lineEnding: "\n"
+    levelEncoder: capitalColor
+    durationEncoder: string
+    timeEncoder: iso8601
+    callerEncoder: short
+  outputPaths: stdout
+  errorOutputPaths: stdout
+apimTokenExchangeConfig:
+  tokenExchangeUrl: https://apim.dv.choreo.dev/oauth2/token
+  subjectTokenType: urn:ietf:params:oauth:token-type:jwt
+  requestedTokenType: urn:ietf:params:oauth:token-type:jwt
+  grantType: urn:ietf:params:oauth:grant-type:token-exchange

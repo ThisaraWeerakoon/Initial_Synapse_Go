@@ -1,0 +1,26 @@
+# config.yaml
+
+core:
+  environment: "development" # Environment: development, production
+  debug: true # Debug mode
+  timezone: "UTC" # Timezone
+
+logger:
+  level:
+    default: "info" # Default log level
+    packages:
+      packageA: "warn"
+      packageB: "info"
+      packageC: "error"
+      # Add more packages and their levels here
+  handler:    
+    format: "json" # Log format: json, text
+    outputPath: "stdout" # Log output path: stdout, stderr, file
+
+
+server:
+  port: 8080 # Port to run the server on
+  readTimeout: 10s # Read timeout for the server
+  writeTimeout: 10s # Write timeout for the server
+  idleTimeout: 120s # Idle timeout for the server
+  maxHeaderBytes: 1 << 20 # Max header bytes for the server
