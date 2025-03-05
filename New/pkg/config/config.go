@@ -9,8 +9,8 @@ import (
 
 	"reflect"
 
-	"Logger/pkg/loggerfactory"
-	"Logger/pkg/observer"
+	"New/pkg/loggerfactory"
+	"New/pkg/observer"
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/knadh/koanf/parsers/yaml"
@@ -29,7 +29,7 @@ type Config struct {
 
 func (c *Config) NotifyLogLevelChange(logLevelMap *map[string]string, slogHandlerConfig loggerfactory.SlogHandlerConfig){
 	for _, logChangeListner := range c.logChangeListners {
-			logChangeListner.UpdateLogger(logLevelMap , slogHandlerConfig )
+			logChangeListner.UpdateLogger()
     }
 }
 

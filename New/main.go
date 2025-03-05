@@ -1,10 +1,10 @@
 package main
 
 import (
-	"Logger/pkg/config"
-	"Logger/pkg/loggerfactory"
-	"Logger/pkg/packageA"
-	"Logger/pkg/packageB"
+	"New/pkg/config"
+	"New/pkg/loggerfactory"
+	"New/pkg/packageA"
+	"New/pkg/packageB"
 	"context"
 	"fmt"
 	"log"
@@ -30,6 +30,10 @@ func main() {
 		levelMap = &map[string]string{} //This level map is used by entire application
 		cfg.MustUnmarshal("logger.level.packages", levelMap)
 	}
+	cm := loggerfactory.GetConfigManager()
+	cm.SetLogLevelMap(levelMap)
+	cm.SetSlogHandlerConfig(slogHandlerConfig)
+
 
 	
 
@@ -37,10 +41,10 @@ func main() {
 		log.Fatalf("Cannot create logger: %s", err.Error())
 	}
 
-	packageA := packageA.New("A", "main", levelMap, slogHandlerConfig)
+	packageA := packageA.New("A", "main")
 	cfg.RegisterObserver(packageA)
 
-	packageB := packageB.New("B", "main", levelMap, slogHandlerConfig)
+	packageB := packageB.New("B", "main")
 	cfg.RegisterObserver(packageB)
 
 	cfg.Watch(context.Background(),configFilePath,levelMap)
