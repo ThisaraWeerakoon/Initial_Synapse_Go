@@ -9,9 +9,9 @@ logger:
   level:
     default: "info" # Default log level
     packages:
-      packageA: "warn"
-      packageB: "debug"
-      packageC: "info"
+      packageA: "error"
+      packageB: "error"
+      packageC: "debug"
       # Add more packages and their levels here
   handler:    
     format: "json" # Log format: json, text

@@ -14,18 +14,17 @@ type PackageB struct {
 
 // New creates a new packageA.
 func New(user string, caller string) *PackageB {
-	
-	
-	return &PackageB{
+
+	p := &PackageB{
 		User: user,
 		Caller:  caller,
-		logger: loggerfactory.GetLogger("packageB"),
 	}
-
+	p.logger = loggerfactory.GetLogger("packageB", p)
+	return p
 }
 
 func (p *PackageB) UpdateLogger(){
-	p.logger = loggerfactory.GetLogger("packageB")
+	p.logger = loggerfactory.GetLogger("packageB", p)
 }
 
 

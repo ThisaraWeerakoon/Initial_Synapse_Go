@@ -14,18 +14,16 @@ type PackageC struct {
 
 // New creates a new packageC.
 func New(user string, caller string) *PackageC {
-	
-	
-	return &PackageC{
+	p := &PackageC{
 		User: user,
 		Caller:  caller,
-		logger: loggerfactory.GetLogger("packageC"),
 	}
-
+	p.logger = loggerfactory.GetLogger("packageC", p)
+	return p
 }
 
 func (p *PackageC) UpdateLogger(){
-	p.logger = loggerfactory.GetLogger("packageC")
+	p.logger = loggerfactory.GetLogger("packageC",p)
 }
 
 

@@ -8,10 +8,18 @@ import (
 	"sync"
 )
 
+// ConfigManager manages logging configurations and registered components
 type ConfigManager struct {
-	mu              sync.RWMutex
-	logLevelMap     *map[string]string
+	mu                sync.RWMutex
+	logLevelMap       *map[string]string
 	slogHandlerConfig SlogHandlerConfig
+	// Track components that have requested loggers
+	registeredComponents map[string]LoggerUser
+}
+
+// LoggerUser is an interface for components that use loggers and need updates
+type LoggerUser interface {
+	UpdateLogger()
 }
 
 var (
@@ -23,16 +31,31 @@ func GetConfigManager() *ConfigManager {
 	once.Do(func() {
 		m := make(map[string]string)
 		configManagerInstance = &ConfigManager{
-			logLevelMap: &m,
+			logLevelMap:          &m,
+			registeredComponents: make(map[string]LoggerUser),
 		}
 	})
 	return configManagerInstance
 }
 
+// SetLogLevelMap sets the log level map.
 func (cm *ConfigManager) SetLogLevelMap(levelMap *map[string]string) {
+	// Make a copy of registered components to avoid holding the lock during notification
+	var componentsToNotify []LoggerUser
+
 	cm.mu.Lock()
-	defer cm.mu.Unlock()
 	cm.logLevelMap = levelMap
+
+	// Create a copy of the components to notify
+	for _, component := range cm.registeredComponents {
+		componentsToNotify = append(componentsToNotify, component)
+	}
+	cm.mu.Unlock()
+
+	// Notify components after releasing the lock
+	for _, component := range componentsToNotify {
+		component.UpdateLogger()
+	}
 }
 
 func (cm *ConfigManager) GetLogLevelMap() *map[string]string {
@@ -41,10 +64,24 @@ func (cm *ConfigManager) GetLogLevelMap() *map[string]string {
 	return cm.logLevelMap
 }
 
+// SetSlogHandlerConfig sets the slog handler configuration.
 func (cm *ConfigManager) SetSlogHandlerConfig(config SlogHandlerConfig) {
+	// Make a copy of registered components to avoid holding the lock during notification
+	var componentsToNotify []LoggerUser
+
 	cm.mu.Lock()
-	defer cm.mu.Unlock()
 	cm.slogHandlerConfig = config
+
+	// Create a copy of the components to notify
+	for _, component := range cm.registeredComponents {
+		componentsToNotify = append(componentsToNotify, component)
+	}
+	cm.mu.Unlock()
+
+	// Notify components after releasing the lock
+	for _, component := range componentsToNotify {
+		component.UpdateLogger()
+	}
 }
 
 func (cm *ConfigManager) GetSlogHandlerConfig() SlogHandlerConfig {
@@ -53,17 +90,26 @@ func (cm *ConfigManager) GetSlogHandlerConfig() SlogHandlerConfig {
 	return cm.slogHandlerConfig
 }
 
-//Type to extract and hold the slog handler related configurations from Config
+// RegisterLoggerUser registers a component that uses a logger
+func (cm *ConfigManager) RegisterLoggerUser(packageName string, component LoggerUser) {
+	cm.mu.Lock()
+	defer cm.mu.Unlock()
+	if _, ok := cm.registeredComponents[packageName]; !ok {
+		cm.registeredComponents[packageName] = component
+	}
+}
+
+// Type to extract and hold the slog handler related configurations from Config
 // format : json/text
 // outputpath: stdout/file/stderr
 type SlogHandlerConfig struct {
-	//json,text
+	// json,text
 	Format string `koanf:"format"`
-	//stdout, file
+	// stdout, file
 	OutputPath string `koanf:"outputPath"`
 }
 
-//Intentionally put 'slog' in future we can introduce more abstract handlers. Every handler should implement slog.Handler interface
+// Intentionally put 'slog' in future we can introduce more abstract handlers. Every handler should implement slog.Handler interface
 func GetSlogHandler(slogHandlerConfig SlogHandlerConfig) slog.Handler {
 	format := slogHandlerConfig.Format
 	outputPath := slogHandlerConfig.OutputPath
@@ -85,8 +131,7 @@ func GetSlogHandler(slogHandlerConfig SlogHandlerConfig) slog.Handler {
 		}
 	}
 	return slogHandler
-} 
-
+}
 
 // A LevelHandler wraps a Handler with an Enabled method
 // that returns false for levels below a minimum.
@@ -135,23 +180,29 @@ func (h *LevelHandler) Handler() slog.Handler {
 func LevelFromString(levelStr string) slog.Leveler {
 	switch strings.ToLower(levelStr) {
 	case "debug":
-			return slog.LevelDebug
+		return slog.LevelDebug
 	case "info":
-			return slog.LevelInfo
+		return slog.LevelInfo
 	case "warn", "warning":
-			return slog.LevelWarn
+		return slog.LevelWarn
 	case "error":
-			return slog.LevelError
+		return slog.LevelError
 	default:
-			// Return default level (e.g., Info) or handle invalid input as needed.
-			return slog.LevelInfo // Or return an error, or a custom level.
+		// Return default level (e.g., Info) or handle invalid input as needed.
+		return slog.LevelInfo // Or return an error, or a custom level.
 	}
 }
 
-
-
-func GetLogger(packageName string) *slog.Logger {
+// GetLogger returns a logger for the specified package name and automatically
+// registers the component if it implements LoggerUser
+func GetLogger(packageName string, component interface{}) *slog.Logger {
 	cm := GetConfigManager()
+
+	// If the component implements LoggerUser, register it
+	if loggerUser, ok := component.(LoggerUser); ok {
+		cm.RegisterLoggerUser(packageName, loggerUser)
+	}
+
 	levelMap := cm.GetLogLevelMap()
 	slogHandlerConfig := cm.GetSlogHandlerConfig()
 
@@ -162,4 +213,3 @@ func GetLogger(packageName string) *slog.Logger {
 	}
 	return slog.New(NewLevelHandler(LevelFromString(levelStr), GetSlogHandler(slogHandlerConfig)))
 }
-
