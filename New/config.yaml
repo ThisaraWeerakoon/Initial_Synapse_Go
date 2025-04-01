@@ -11,7 +11,7 @@ logger:
     packages:
       packageA: "error"
       packageB: "error"
-      packageC: "debug"
+      packageC: "error"
       # Add more packages and their levels here
   handler:    
     format: "json" # Log format: json, text

@@ -1,8 +1,9 @@
 package config
 
 import (
-	"fmt"
 	"New/pkg/loggerfactory"
+	"context"
+	"fmt"
 )
 
 func InitializeConfig(configFilePath string) (*Config, error) {
@@ -22,6 +23,8 @@ func InitializeConfig(configFilePath string) (*Config, error) {
 	cm := loggerfactory.GetConfigManager()
 	cm.SetLogLevelMap(&levelMap)
 	cm.SetSlogHandlerConfig(slogHandlerConfig)
+
+	cfg.Watch(context.Background(), configFilePath)
 
 	return cfg, nil
 }
