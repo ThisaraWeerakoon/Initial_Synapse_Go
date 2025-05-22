@@ -14,9 +14,17 @@ func main() {
 		fmt.Fprint(w, "Loggging in to version 1")
 	})
 
+	version1Router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Registering to version 1")
+	})
+
 	version2Router := http.NewServeMux()
 	version2Router.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request){
 		fmt.Fprint(w, "Logging in to version 2")
+	})
+
+	version2Router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request){
+		fmt.Fprint(w, "Registering to version 2")
 	})
 
 	//ContextBasedVersionStrategy ("api/v1" and "api/v2")
@@ -31,13 +39,3 @@ func main() {
 
 
 }
-
-
-// regex 
-// performance
-
-
-//gin
-
-
-/api/v1/department/1/employee/2
